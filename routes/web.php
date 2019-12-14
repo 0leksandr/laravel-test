@@ -11,6 +11,13 @@
 |
 */
 
-Route::get('/', function () {
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', static function () {
     return view('welcome');
 });
+
+Route::get('login', 'Auth\LoginController@showLoginForm');
+//Route::get('/login', static function () {
+//    return '123';
+//});
