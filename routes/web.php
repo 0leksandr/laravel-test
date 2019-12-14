@@ -18,6 +18,4 @@ Route::get('/', static function () {
 });
 
 Route::get('login', 'Auth\LoginController@showLoginForm');
-//Route::get('/login', static function () {
-//    return '123';
-//});
+Route::post('login', 'Auth\LoginController@login2');
