@@ -21,10 +21,10 @@ Route::get('/', static function () {
 //Route::post('login', 'Auth\LoginController@login2');
 Route::get('login', 'Auth2\LoginController@get');
 Route::post('login', 'Auth2\LoginController@post');
+Route::get('logout', 'Auth2\LoginController@logout');
 
 Route::get('register', 'Auth2\RegisterController@get');
 Route::post('register', 'Auth2\RegisterController@post');
 
-Route::get('feedback', 'FeedbackController@create');
+Route::get('feedback', 'FeedbackController@index');
 Route::post('feedback', 'FeedbackController@store');
-Route::get('feedback-list', 'FeedbackController@index');

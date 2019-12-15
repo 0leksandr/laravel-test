@@ -23,4 +23,10 @@ class LoginController extends Controller
         }
         return view('auth.login', ['error' => 'Invalid credentials']);
     }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/');
+    }
 }

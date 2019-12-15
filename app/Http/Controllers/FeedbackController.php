@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Feedback;
+use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -16,15 +17,15 @@ class FeedbackController extends Controller
      */
     public function index()
     {
-        return view('feedback.list', ['feedbacks' => Feedback::all()]);
-    }
+        if ($user = Auth::user()) {
+            /** @var User $user */
+            if ($user->getAttribute('role') === 'manager') {
+                return view('feedback.list', ['feedbacks' => Feedback::all()]);
+            }
+            return view('feedback.new');
+        }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('feedback.new');
+        return redirect('/login');
     }
 
     /**
