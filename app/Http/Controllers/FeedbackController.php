@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Feedback;
+use App\Jobs\SendMail;
+use App\Mail;
 use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -81,10 +83,13 @@ class FeedbackController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(1)
             ->get();
-        if ($feedbacks && ($feedbacks[0]->created_at->timestamp > (now()->timestamp - 60))) {
-            throw ValidationException::withMessages([
-                'client_id' => ['Too often, relax'],
-            ]);
+        if ($feedbacks) {
+            $delay = $feedbacks[0]->created_at->timestamp - (now()->timestamp - 10);
+            if ($delay > 0) {
+                throw ValidationException::withMessages([
+                    'client_id' => ["Too often, relax. Wait for {$delay} sec"],
+                ]);
+            }
         }
 
         $feedback = new Feedback([
@@ -99,6 +104,10 @@ class FeedbackController extends Controller
             $feedback->file = $filename;
             $feedback->saveOrFail();
         }
+
+        $mail = new Mail(['message' => "New feedback #{$feedback->id}"]);
+        $mail->saveOrFail();
+        SendMail::dispatch($mail)->onConnection('database');
 
         return redirect('/');
     }
