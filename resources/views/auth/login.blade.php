@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'Welcome home)')
+@section('title', 'Welcome home!')
 
 @section('body')
     @if(isset($error))

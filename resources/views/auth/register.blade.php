@@ -1,11 +1,7 @@
 @extends('app')
 
 @section('body')
-    @if(isset($error))
-        <div class="alert alert-danger">
-            {{ $error }}
-        </div>
-    @endif
+    @include('component.errors')
     {!! Form::open(['url' => '/register']) !!}
         <div class="form-group">
             {{ Form::label('name', 'Name') }}
