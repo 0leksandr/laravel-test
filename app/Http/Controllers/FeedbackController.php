@@ -7,8 +7,10 @@ use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class FeedbackController extends Controller
 {
@@ -20,7 +22,15 @@ class FeedbackController extends Controller
         if ($user = Auth::user()) {
             /** @var User $user */
             if ($user->getAttribute('role') === 'manager') {
-                return view('feedback.list', ['feedbacks' => Feedback::all()]);
+                $feedbacks = Feedback::all();
+
+                return view(
+                    'feedback.list',
+                    [
+                        'feedbacks' => $feedbacks,
+                        'feedback_ids' => implode(',', $this->getIds($feedbacks))
+                    ]
+                );
             }
             return view('feedback.new');
         }
@@ -29,12 +39,33 @@ class FeedbackController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
      * @param Request $request
      * @return RedirectResponse|Redirector
      * @throws ValidationException
+     * @throws Throwable
      */
-    public function store(Request $request)
+    public function post(Request $request)
+    {
+        if ($user = Auth::user()) {
+            /** @var User $user */
+            if ($user->role === 'manager') {
+                return $this->updateMultiple($request);
+            }
+
+            return $this->store($request, $user);
+        }
+
+        return redirect('/login');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @param User $user
+     * @return RedirectResponse|Redirector
+     * @throws ValidationException
+     */
+    private function store(Request $request, User $user)
     {
         $this->validate(
             $request,
@@ -43,15 +74,42 @@ class FeedbackController extends Controller
                 'message' => 'required',
             ]
         );
-        if ($user = Auth::user()) {
-            (new Feedback([
-                'subject' => $request->get('subject'),
-                'message' => $request->get('message'),
-                'client_id' => $user->getAuthIdentifier(),
-            ]))->save();
-        }
+        (new Feedback([
+            'subject' => $request->get('subject'),
+            'message' => $request->get('message'),
+            'client_id' => $user->getAuthIdentifier(),
+        ]))->save();
 
         return redirect('/');
+    }
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse|Redirector
+     * @throws Throwable
+     */
+    private function updateMultiple(Request $request)
+    {
+        $feedbackIds = explode(',', $request->get('feedback_ids'));
+        $processed = $request->get('processed');
+        foreach ($feedbackIds as $feedbackId) {
+            /** @var Feedback $feedback */
+            $feedback = Feedback::find($feedbackId);
+            $feedback->processed = in_array($feedbackId, $processed);
+            $feedback->saveOrFail();
+        }
+
+        return redirect('/feedback');
+    }
+
+    private function getIds(Collection $feedbacks): array
+    {
+        return array_map(
+            static function (Feedback $feedback): int {
+                return $feedback->id;
+            },
+            $feedbacks->all()
+        );
     }
 
     /**

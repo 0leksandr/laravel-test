@@ -11,5 +11,6 @@ class Feedback extends Model
         'message',
         'client_id',
         'file',
+        'processed',
     ];
 }
