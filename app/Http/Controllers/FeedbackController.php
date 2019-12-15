@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -64,6 +65,7 @@ class FeedbackController extends Controller
      * @param User $user
      * @return RedirectResponse|Redirector
      * @throws ValidationException
+     * @throws Throwable
      */
     private function store(Request $request, User $user)
     {
@@ -74,11 +76,18 @@ class FeedbackController extends Controller
                 'message' => 'required',
             ]
         );
-        (new Feedback([
-            'subject' => $request->get('subject'),
-            'message' => $request->get('message'),
+        $feedback = new Feedback([
+            'subject'   => $request->get('subject'),
+            'message'   => $request->get('message'),
             'client_id' => $user->getAuthIdentifier(),
-        ]))->save();
+        ]);
+        $feedback->saveOrFail();
+        if ($file = $request->file('file')) {
+            $filename = "feedback/{$feedback->id}.{$file->extension()}";
+            Storage::put($filename, file_get_contents($file));
+            $feedback->file = $filename;
+            $feedback->saveOrFail();
+        }
 
         return redirect('/');
     }

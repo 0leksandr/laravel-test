@@ -4,7 +4,7 @@
 
 @section('body')
     @include('component.errors')
-    {!! Form::open(['url' => '/feedback']) !!}
+    {!! Form::open(['url' => '/feedback', 'files' => true]) !!}
         <div class="form-group">
             {{ Form::label('subject', 'Subject') }}
             {{ Form::text('subject', '', ['class' => 'form-control', 'placeholder' => 'Enter subject']) }}
@@ -12,6 +12,10 @@
         <div class="form-group">
             {{ Form::label('message', 'Message') }}
             {{ Form::textarea('message', '', ['class' => 'form-control', 'placeholder' => 'Enter message']) }}
+        </div>
+        <div class="form-group">
+            {{ Form::label('file', 'File') }}
+            {{ Form::file('file') }}
         </div>
         <div class="form-group">
             {{ Form::submit('Submit', ['class' => 'btn btn-primary']) }}
