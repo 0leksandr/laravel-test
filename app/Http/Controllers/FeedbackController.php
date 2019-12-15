@@ -76,6 +76,17 @@ class FeedbackController extends Controller
                 'message' => 'required',
             ]
         );
+
+        $feedbacks = Feedback::where(['client_id' => $user->id])
+            ->orderBy('created_at', 'desc')
+            ->limit(1)
+            ->get();
+        if ($feedbacks && ($feedbacks[0]->created_at->timestamp > (now()->timestamp - 60))) {
+            throw ValidationException::withMessages([
+                'client_id' => ['Too often, relax'],
+            ]);
+        }
+
         $feedback = new Feedback([
             'subject'   => $request->get('subject'),
             'message'   => $request->get('message'),
