@@ -17,5 +17,10 @@ Route::get('/', static function () {
     return view('welcome');
 });
 
-Route::get('login', 'Auth\LoginController@showLoginForm');
-Route::post('login', 'Auth\LoginController@login2');
+//Route::get('login', 'Auth\LoginController@showLoginForm');
+//Route::post('login', 'Auth\LoginController@login2');
+Route::get('login', 'Auth2\LoginController@get');
+Route::post('login', 'Auth2\LoginController@post');
+
+Route::get('register', 'Auth2\RegisterController@get');
+Route::post('register', 'Auth2\RegisterController@post');

@@ -6,7 +6,11 @@
             {{ $error }}
         </div>
     @endif
-    {!! Form::open(['url' => '/login']) !!}
+    {!! Form::open(['url' => '/register']) !!}
+        <div class="form-group">
+            {{ Form::label('name', 'Name') }}
+            {{ Form::text('name', '', ['class' => 'form-control', 'placeholder' => 'Enter name']) }}
+        </div>
         <div class="form-group">
             {{ Form::label('email', 'Email') }}
             {{ Form::text('email', '', ['class' => 'form-control', 'placeholder' => 'Enter email']) }}
