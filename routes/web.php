@@ -24,3 +24,7 @@ Route::post('login', 'Auth2\LoginController@post');
 
 Route::get('register', 'Auth2\RegisterController@get');
 Route::post('register', 'Auth2\RegisterController@post');
+
+Route::get('feedback', 'FeedbackController@create');
+Route::post('feedback', 'FeedbackController@store');
+Route::get('feedback-list', 'FeedbackController@index');

@@ -1,5 +1,7 @@
 @extends('app')
 
+@section('title', 'Welcome home)')
+
 @section('body')
     @if(isset($error))
         <div class="alert alert-danger">
